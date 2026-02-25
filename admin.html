@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administracion</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-200 font-sans p-8">
+    <div class="max-w-md mx-auto bg-white p-8 rounded-xl shadow-lg">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6">Agregar Nuevo Platillo</h2>
+        
+        <div class="mb-4">
+            <label class="block text-gray-600 text-sm mb-2">Nombre del platillo</label>
+            <input type="text" id="nombre" placeholder="Ej. Gringa de Pastor" class="w-full border rounded p-2 focus:outline-none focus:border-blue-500">
+        </div>
+
+        <div class="mb-6">
+            <label class="block text-gray-600 text-sm mb-2">Precio</label>
+            <input type="number" id="precio" placeholder="Ej. 45.00" class="w-full border rounded p-2 focus:outline-none focus:border-blue-500">
+        </div>
+
+        <input type="hidden" id="categoria" value="1">
+
+        <button onclick="guardarPlatillo()" class="w-full bg-black text-white font-bold py-3 rounded hover:bg-gray-800 transition duration-300">
+            Guardar Platillo
+        </button>
+    </div>
+
+    <script>
+        async function guardarPlatillo() {
+            const nombre = document.getElementById('nombre').value;
+            const precio = document.getElementById('precio').value;
+            const categoria_id = document.getElementById('categoria').value;
+
+            if(!nombre || !precio) {
+                alert('Por favor llena todos los campos');
+                return;
+            }
+
+            try {
+                const respuesta = await fetch('http://localhost:3000/api/platillos', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        categoria_id: parseInt(categoria_id),
+                        nombre: nombre,
+                        precio: parseFloat(precio)
+                    })
+                });
+
+                if(respuesta.ok) {
+                    alert('Platillo guardado exitosamente');
+                    document.getElementById('nombre').value = '';
+                    document.getElementById('precio').value = '';
+                } else {
+                    alert('Error al guardar en la base de datos');
+                }
+            } catch (error) {
+                alert('Hubo un error de conexion');
+                console.error(error);
+            }
+        }
+    </script>
+</body>
+</html>

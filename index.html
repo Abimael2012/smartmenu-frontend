@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Digital</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div id="app" class="max-w-md mx-auto bg-white min-h-screen shadow-lg">
+        <header id="header" class="text-white p-6 text-center rounded-b-3xl shadow-md">
+            <h1 id="nombre-restaurante" class="text-3xl font-bold">Cargando menu...</h1>
+        </header>
+        <main id="lista-platillos" class="p-6">
+        </main>
+    </div>
+
+    <script>
+        async function cargarMenu() {
+            try {
+                const respuesta = await fetch('http://localhost:3000/api/menu/1');
+                const datos = await respuesta.json();
+
+                document.getElementById('nombre-restaurante').textContent = datos.restaurante.nombre;
+                document.getElementById('header').style.backgroundColor = datos.restaurante.color;
+
+                const contenedor = document.getElementById('lista-platillos');
+                let htmlContenido = '';
+
+                datos.platillos.forEach(platillo => {
+                    htmlContenido += `
+                        <div class="mb-4 border-b pb-4">
+                            <h2 class="text-xl font-semibold text-gray-800">${platillo.nombre}</h2>
+                            <p class="text-gray-500 text-sm mt-1">${platillo.categoria}</p>
+                            <p class="text-green-600 font-bold mt-2">$${platillo.precio}</p>
+                        </div>
+                    `;
+                });
+
+                contenedor.innerHTML = htmlContenido;
+            } catch (error) {
+                console.error('Error al cargar:', error);
+                document.getElementById('nombre-restaurante').textContent = 'Error al cargar';
+            }
+        }
+
+        cargarMenu();
+    </script>
+</body>
+</html>
