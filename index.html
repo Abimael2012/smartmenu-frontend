@@ -3,47 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menu Digital</title>
+    <title>600 Sur Hochos y más - Menú JC</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lacquer&family=Patrick+Hand&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'impacto': ['Lacquer', 'cursive'], 
+                        'pizarra': ['"Patrick Hand"', 'cursive'], 
+                    },
+                    colors: {
+                        'oro-jc': '#d09306', 
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #1a1a1a;
+            background-image: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)), url('fondo-textura.png');
+            background-repeat: repeat;
+            background-size: 350px; 
+            background-attachment: fixed;
+        }
+    </style>
 </head>
-<body class="bg-gray-100 font-sans">
-    <div id="app" class="max-w-md mx-auto bg-white min-h-screen shadow-lg">
-        <header id="header" class="text-white p-6 text-center rounded-b-3xl shadow-md">
-            <h1 id="nombre-restaurante" class="text-3xl font-bold">Cargando menu...</h1>
+<body class="font-pizarra antialiased text-gray-100 overflow-x-hidden">
+    <div id="app" class="max-w-md mx-auto min-h-screen pb-10 relative">
+        
+        <header id="header" class="p-8 pt-14 text-center bg-black/85 border-b-4 border-dashed border-oro-jc relative overflow-hidden shadow-2xl backdrop-blur-sm">
+            <h1 id="nombre-restaurante" class="font-impacto text-5xl text-oro-jc leading-tight tracking-tighter transform -rotate-2 drop-shadow-[0_4px_0px_rgba(0,0,0,1)]">
+                600 SUR HOCHOS Y MÁS
+            </h1>
+            <p class="font-pizarra text-2xl text-white opacity-80 mt-4 tracking-widest uppercase">
+                MENÚ DIGITAL
+            </p>
         </header>
-        <main id="lista-platillos" class="p-6">
-        </main>
+
+        <main id="lista-platillos" class="p-5 space-y-10 mt-6">
+            </main>
+
+        <footer class="text-center mt-20 pb-12 flex flex-col items-center justify-center space-y-2">
+            <span class="font-pizarra text-4xl text-white font-bold leading-none mb-1 tracking-tighter uppercase">JC</span>
+            
+            <div class="space-y-1 text-gray-300 text-2xl">
+                <p>Pedro Gutierrez 600 Sur, col. La Palmita</p>
+                <p>Tecomán, Col</p>
+            </div>
+            
+            <div class="mt-8">
+                <span class="font-pizarra text-white text-3xl inline-block bg-oro-jc/20 px-8 py-3 rounded-2xl border-2 border-oro-jc/40 shadow-xl transform rotate-1">
+                    Pedidos al: 312 236 2875
+                </span>
+            </div>
+        </footer>
     </div>
 
     <script>
-        async function cargarMenu() {
-            try {
-                const respuesta = await fetch('http://localhost:3000/api/menu/1');
-                const datos = await respuesta.json();
-
-                document.getElementById('nombre-restaurante').textContent = datos.restaurante.nombre;
-                document.getElementById('header').style.backgroundColor = datos.restaurante.color;
-
-                const contenedor = document.getElementById('lista-platillos');
-                let htmlContenido = '';
-
-                datos.platillos.forEach(platillo => {
-                    htmlContenido += `
-                        <div class="mb-4 border-b pb-4">
-                            <h2 class="text-xl font-semibold text-gray-800">${platillo.nombre}</h2>
-                            <p class="text-gray-500 text-sm mt-1">${platillo.categoria}</p>
-                            <p class="text-green-600 font-bold mt-2">$${platillo.precio}</p>
-                        </div>
-                    `;
-                });
-
-                contenedor.innerHTML = htmlContenido;
-            } catch (error) {
-                console.error('Error al cargar:', error);
-                document.getElementById('nombre-restaurante').textContent = 'Error al cargar';
-            }
+        function toggleImagen(id) {
+            const elemento = document.getElementById(`img-container-${id}`);
+            const estaOculto = elemento.classList.contains('hidden');
+            document.querySelectorAll('[id^="img-container-"]').forEach(el => el.classList.add('hidden'));
+            if (estaOculto) elemento.classList.remove('hidden');
         }
 
+        async function cargarMenu() {
+            try {
+                // CAMBIO AQUÍ: Usamos tu link de Dev Tunnel para que funcione en el celular
+                const respuesta = await fetch('https://rm0nscfv-3000.usw3.devtunnels.ms/api/menu/2');
+                const datos = await respuesta.json();
+                const contenedor = document.getElementById('lista-platillos');
+                
+                const agrupados = {};
+                datos.platillos.forEach(p => {
+                    if (!agrupados[p.categoria]) agrupados[p.categoria] = [];
+                    agrupados[p.categoria].push(p);
+                });
+
+                let html = '';
+                for (const cat in agrupados) {
+                    html += `
+                        <div class="mt-16 mb-10 text-center">
+                            <div class="inline-block bg-oro-jc px-6 py-2 shadow-xl transform -rotate-2 border-2 border-black/10">
+                                <h3 class="font-impacto text-4xl text-black uppercase tracking-tighter">
+                                    ${cat}
+                                </h3>
+                            </div>
+                        </div>`;
+
+                    agrupados[cat].forEach(p => {
+                        html += `
+                            <div class="relative mb-8 group">
+                                <div class="absolute inset-0 bg-black/50 rounded-2xl transform rotate-1"></div>
+                                <div class="relative bg-zinc-900/90 p-6 rounded-2xl border border-zinc-700/40 shadow-2xl backdrop-blur-sm">
+                                    <div onclick="toggleImagen(${p.id})" class="flex justify-between items-start cursor-pointer">
+                                        <div class="pr-3 flex-1">
+                                            <h2 class="font-impacto text-3xl text-oro-jc tracking-tight">
+                                                ${p.nombre}
+                                            </h2>
+                                            <p class="text-gray-400 text-xl mt-3 font-pizarra leading-tight italic">
+                                                ${p.descripcion || ''}
+                                            </p>
+                                        </div>
+                                        <div class="text-right flex flex-col items-end">
+                                            <span class="font-impacto text-3xl text-white block bg-black/40 px-3 py-1 rounded-lg border border-white/10">$${p.precio}</span>
+                                            <span class="text-xs mt-4 text-oro-jc font-pizarra opacity-50 block tracking-widest uppercase">Ver Foto ▼</span>
+                                        </div>
+                                    </div>
+                                    <div id="img-container-${p.id}" class="hidden mt-6 border-4 border-white/5 rounded-2xl overflow-hidden shadow-2xl">
+                                        ${p.imagen_url 
+                                            ? `<img src="${p.imagen_url}" class="w-full h-72 object-cover" alt="${p.nombre}">`
+                                            : `<div class="h-32 flex items-center justify-center bg-black/60 font-pizarra text-gray-700 text-3xl uppercase tracking-widest">Próximamente...</div>`
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                contenedor.innerHTML = html;
+            } catch (e) { 
+                console.error('Error de conexión con el túnel:', e); 
+            }
+        }
         cargarMenu();
     </script>
 </body>

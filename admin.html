@@ -3,65 +3,216 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Administracion</title>
+    <title>Admin - 600 Sur Hochos y más</title>
+    <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Patrick+Hand&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'rotulo': ['"Permanent Marker"', 'cursive'], 
+                        'pizarra': ['"Patrick Hand"', 'cursive'], 
+                    },
+                    colors: {
+                        'oro-jc': '#d09306',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #1a1a1a;
+            background-image: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('fondo-textura.png');
+            background-repeat: repeat;
+            background-size: 350px; 
+            background-attachment: fixed;
+        }
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .hidden { display: none; }
+    </style>
 </head>
-<body class="bg-gray-200 font-sans p-8">
-    <div class="max-w-md mx-auto bg-white p-8 rounded-xl shadow-lg">
-        <h2 class="text-2xl font-bold text-gray-800 mb-6">Agregar Nuevo Platillo</h2>
-        
-        <div class="mb-4">
-            <label class="block text-gray-600 text-sm mb-2">Nombre del platillo</label>
-            <input type="text" id="nombre" placeholder="Ej. Gringa de Pastor" class="w-full border rounded p-2 focus:outline-none focus:border-blue-500">
-        </div>
+<body class="font-pizarra antialiased text-gray-100 p-4 pb-20">
 
-        <div class="mb-6">
-            <label class="block text-gray-600 text-sm mb-2">Precio</label>
-            <input type="number" id="precio" placeholder="Ej. 45.00" class="w-full border rounded p-2 focus:outline-none focus:border-blue-500">
-        </div>
-
-        <input type="hidden" id="categoria" value="1">
-
-        <button onclick="guardarPlatillo()" class="w-full bg-black text-white font-bold py-3 rounded hover:bg-gray-800 transition duration-300">
-            Guardar Platillo
-        </button>
+    <div id="pin-screen" class="max-w-xs mx-auto mt-20 text-center bg-black/80 p-8 rounded-3xl border-2 border-dashed border-oro-jc backdrop-blur-md">
+        <h1 class="font-rotulo text-4xl mb-6 text-oro-jc uppercase tracking-widest">Acceso Seguro</h1>
+        <p class="text-xl mb-4 opacity-70">Ingresa el PIN de 4 dígitos</p>
+        <input type="password" id="pin-input" maxlength="4" class="w-full bg-zinc-900 border-2 border-zinc-800 text-center text-5xl py-4 rounded-2xl tracking-[0.5em] focus:border-oro-jc outline-none text-oro-jc transition-all">
+        <div id="pin-error" class="text-red-500 text-lg mt-4 hidden font-bold uppercase">⚠️ PIN INCORRECTO</div>
     </div>
 
+    <div id="main-menu" class="max-w-md mx-auto mt-10 hidden">
+        <header class="text-center mb-12">
+            <h2 class="font-rotulo text-5xl text-oro-jc uppercase tracking-tighter transform -rotate-1">Panel de Control</h2>
+            <p class="text-2xl opacity-60 mt-2">600 SUR HOCHOS Y MÁS</p>
+        </header>
+        
+        <div class="grid grid-cols-1 gap-6">
+            <button onclick="showSection('add-product')" class="bg-black/60 border-2 border-zinc-800 p-6 rounded-2xl text-left hover:border-oro-jc transition-all group">
+                <span class="font-rotulo text-3xl text-oro-jc block group-hover:scale-105 transition-transform">➕ AGREGAR PRODUCTO</span>
+            </button>
+            <button onclick="showSection('manage-inventory')" class="bg-black/60 border-2 border-zinc-800 p-6 rounded-2xl text-left hover:border-oro-jc transition-all group">
+                <span class="font-rotulo text-3xl text-oro-jc block group-hover:scale-105 transition-transform">🚫 DISPONIBILIDAD</span>
+            </button>
+            <button onclick="showSection('update-prices')" class="bg-black/60 border-2 border-zinc-800 p-6 rounded-2xl text-left hover:border-oro-jc transition-all group">
+                <span class="font-rotulo text-3xl text-oro-jc block group-hover:scale-105 transition-transform">💰 MODIFICAR PRECIOS</span>
+            </button>
+        </div>
+
+        <button onclick="location.reload()" class="w-full mt-12 text-xl opacity-40 hover:opacity-100 hover:text-oro-jc transition-all uppercase underline">Cerrar Sesión</button>
+    </div>
+
+    <div id="add-product" class="max-w-4xl mx-auto mt-6 hidden">
+        <button onclick="showSection('main-menu')" class="text-2xl mb-8 opacity-60 hover:text-oro-jc">← Volver</button>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <form id="form-nuevo" class="space-y-4 bg-black/80 p-8 rounded-3xl border-2 border-zinc-800 backdrop-blur-md">
+                <h3 class="font-rotulo text-3xl text-oro-jc mb-6 uppercase text-center">Nuevo Registro</h3>
+                <select id="categoria_id" class="w-full bg-zinc-900 p-4 rounded-xl border border-zinc-800 focus:border-oro-jc outline-none text-xl">
+                    <option value="3">Hamburguesas</option>
+                    <option value="4">Hot Dogs</option>
+                    <option value="5">Snacks y Otros</option>
+                    <option value="6">Bebidas</option>
+                </select>
+                <input type="text" id="nombre" placeholder="Nombre" class="w-full bg-zinc-900 p-4 rounded-xl border border-zinc-800 focus:border-oro-jc outline-none text-xl" oninput="updatePreview()">
+                <textarea id="descripcion" placeholder="Ingredientes" class="w-full bg-zinc-900 p-4 rounded-xl border border-zinc-800 focus:border-oro-jc outline-none text-xl h-24" oninput="updatePreview()"></textarea>
+                <input type="number" id="precio" placeholder="Precio ($)" class="w-full bg-zinc-900 p-4 rounded-xl border border-zinc-800 focus:border-oro-jc outline-none text-xl" oninput="updatePreview()">
+                <input type="text" id="imagen" placeholder="URL de la imagen" class="w-full bg-zinc-900 p-4 rounded-xl border border-zinc-800 focus:border-oro-jc outline-none text-xl" oninput="updatePreview()">
+                <button type="button" onclick="guardarProducto()" class="w-full bg-oro-jc text-black font-rotulo text-3xl py-4 rounded-xl mt-6 hover:bg-yellow-600 shadow-xl">GUARDAR</button>
+            </form>
+            <div class="hidden lg:block">
+                <h3 class="font-rotulo text-2xl opacity-40 mb-6 text-center">VISTA PREVIA</h3>
+                <div class="bg-zinc-900/50 p-10 rounded-[3rem] border-4 border-dashed border-oro-jc/20">
+                    <div class="relative bg-zinc-900/90 p-8 rounded-3xl border border-zinc-700/40 shadow-2xl backdrop-blur-sm transform rotate-1">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="flex-1 pr-4">
+                                <h2 id="prev-nombre" class="font-rotulo text-3xl text-oro-jc leading-tight uppercase">Nombre</h2>
+                                <p id="prev-desc" class="text-gray-400 text-2xl mt-2 italic leading-tight">Descripción...</p>
+                            </div>
+                            <span id="prev-precio" class="font-rotulo text-3xl text-white bg-black/40 px-4 py-1 rounded-lg border border-white/10">$0.00</span>
+                        </div>
+                        <img id="prev-img" src="" class="w-full h-64 object-cover rounded-2xl hidden shadow-2xl border-4 border-white/5">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="update-prices" class="max-w-2xl mx-auto mt-6 hidden">
+        <button onclick="showSection('main-menu')" class="text-2xl mb-8 opacity-60 hover:text-oro-jc">← Volver</button>
+        <h3 class="font-rotulo text-4xl text-oro-jc mb-8 uppercase text-center">Ajuste de Precios</h3>
+        <div id="lista-precios-admin" class="space-y-4"></div>
+    </div>
+
+    <div id="manage-inventory" class="max-w-2xl mx-auto mt-6 hidden">
+        <button onclick="showSection('main-menu')" class="text-2xl mb-8 opacity-60 hover:text-oro-jc">← Volver</button>
+        <h3 class="font-rotulo text-4xl text-oro-jc mb-8 uppercase text-center">Gestión de Stock</h3>
+        <div id="lista-disponibilidad-admin" class="space-y-4"></div>
+    </div>
+
+    <footer id="admin-footer" class="text-center mt-20 hidden">
+        <span class="font-pizarra text-4xl text-white font-bold tracking-tighter uppercase opacity-50">JC</span>
+        <p class="text-gray-500 text-xl font-pizarra">Pedro Gutierrez 600 Sur</p>
+    </footer>
+
     <script>
-        async function guardarPlatillo() {
-            const nombre = document.getElementById('nombre').value;
-            const precio = document.getElementById('precio').value;
-            const categoria_id = document.getElementById('categoria').value;
+        // CAMBIO: Apuntamos al túnel de VS Code para que funcione en el cel
+        const API_URL = 'https://rm0nscfv-3000.usw3.devtunnels.ms/api'; 
+        const RESTAURANTE_ID = 2; 
+        const PIN_CORRECTO = "1234";
 
-            if(!nombre || !precio) {
-                alert('Por favor llena todos los campos');
-                return;
+        const pinInput = document.getElementById('pin-input');
+        pinInput.addEventListener('input', () => {
+            if(pinInput.value === PIN_CORRECTO) {
+                showSection('main-menu');
+                pinInput.value = "";
+            } else if(pinInput.value.length === 4) {
+                document.getElementById('pin-error').classList.remove('hidden');
+                setTimeout(() => pinInput.value = "", 500);
             }
+        });
 
+        function showSection(sectionId) {
+            document.querySelectorAll('body > div').forEach(div => div.classList.add('hidden'));
+            document.getElementById(sectionId).classList.remove('hidden');
+            document.getElementById('admin-footer').classList.toggle('hidden', sectionId === 'pin-screen');
+            if(sectionId === 'update-prices') cargarListaAdmin('precios');
+            if(sectionId === 'manage-inventory') cargarListaAdmin('disponibilidad');
+        }
+
+        function updatePreview() {
+            document.getElementById('prev-nombre').textContent = document.getElementById('nombre').value || "Nombre";
+            document.getElementById('prev-desc').textContent = document.getElementById('descripcion').value || "Descripción...";
+            document.getElementById('prev-precio').textContent = "$" + (document.getElementById('precio').value || "0.00");
+            const imgUrl = document.getElementById('imagen').value;
+            const prevImg = document.getElementById('prev-img');
+            if(imgUrl) { prevImg.src = imgUrl; prevImg.classList.remove('hidden'); } else { prevImg.classList.add('hidden'); }
+        }
+
+        async function cargarListaAdmin(modo) {
+            const container = modo === 'precios' ? 'lista-precios-admin' : 'lista-disponibilidad-admin';
+            const target = document.getElementById(container);
+            target.innerHTML = '<p class="text-center text-2xl opacity-20 py-10 font-pizarra">Sincronizando con Neon...</p>';
             try {
-                const respuesta = await fetch('http://localhost:3000/api/platillos', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        categoria_id: parseInt(categoria_id),
-                        nombre: nombre,
-                        precio: parseFloat(precio)
-                    })
+                const res = await fetch(`${API_URL}/admin/platillos/${RESTAURANTE_ID}`);
+                const productos = await res.json();
+                let html = '';
+                productos.forEach(p => {
+                    if(modo === 'precios') {
+                        html += `<div class="bg-black/60 p-6 rounded-2xl border-2 border-zinc-800 flex justify-between items-center group hover:border-oro-jc transition-all">
+                            <div><p class="text-lg text-oro-jc font-bold uppercase tracking-widest font-pizarra">${p.categoria_nombre}</p>
+                            <h4 class="font-rotulo text-3xl text-white uppercase">${p.nombre}</h4></div>
+                            <div class="flex items-center gap-4"><span class="text-3xl text-oro-jc font-rotulo">$</span>
+                            <input type="number" id="p-${p.id}" value="${p.precio}" class="w-24 bg-zinc-900 p-3 rounded-xl text-center border-2 border-zinc-800 text-2xl focus:border-oro-jc outline-none font-pizarra">
+                            <button onclick="actPrecio(${p.id})" class="bg-oro-jc text-black px-6 py-3 rounded-xl text-xl font-rotulo hover:bg-yellow-600 transition-colors">OK</button></div></div>`;
+                    } else {
+                        html += `<div class="bg-black/60 p-6 rounded-2xl border-2 border-zinc-800 flex justify-between items-center ${!p.disponible ? 'opacity-30 grayscale' : ''} transition-all">
+                            <h4 class="font-rotulo text-3xl text-white uppercase">${p.nombre}</h4>
+                            <button onclick="cambiarDisp(${p.id}, ${!p.disponible})" class="px-6 py-3 rounded-xl text-xl font-rotulo shadow-lg transition-all ${p.disponible ? 'bg-red-500/20 text-red-500 border border-red-500/50' : 'bg-green-600 text-black'}">
+                            ${p.disponible ? 'DAR DE BAJA' : 'REACTIVAR'}</button></div>`;
+                    }
                 });
+                target.innerHTML = html;
+            } catch (e) { target.innerHTML = 'Error al conectar'; }
+        }
 
-                if(respuesta.ok) {
-                    alert('Platillo guardado exitosamente');
-                    document.getElementById('nombre').value = '';
-                    document.getElementById('precio').value = '';
-                } else {
-                    alert('Error al guardar en la base de datos');
-                }
-            } catch (error) {
-                alert('Hubo un error de conexion');
-                console.error(error);
-            }
+        async function actPrecio(id) {
+            const nuevoPrecio = document.getElementById(`p-${id}`).value;
+            await fetch(`${API_URL}/platillos/${id}/precio`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ nuevoPrecio: parseFloat(nuevoPrecio) })
+            });
+            alert("✅ Precio Actualizado");
+            cargarListaAdmin('precios');
+        }
+
+        async function cambiarDisp(id, estado) {
+            await fetch(`${API_URL}/platillos/${id}/disponibilidad`, {
+                method: 'PATCH',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ disponible: estado })
+            });
+            cargarListaAdmin('disponibilidad');
+        }
+
+        async function guardarProducto() {
+            const data = {
+                categoria_id: parseInt(document.getElementById('categoria_id').value),
+                nombre: document.getElementById('nombre').value,
+                descripcion: document.getElementById('descripcion').value,
+                precio: parseFloat(document.getElementById('precio').value),
+                imagen_url: document.getElementById('imagen').value
+            };
+            if(!data.nombre || !data.precio) return alert("Nombre y Precio son necesarios");
+            try {
+                const res = await fetch(`${API_URL}/platillos`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+                if(res.ok) { alert("✅ Guardado"); document.getElementById('form-nuevo').reset(); showSection('main-menu'); }
+            } catch (e) { alert("❌ Error"); }
         }
     </script>
 </body>
