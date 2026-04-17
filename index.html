@@ -73,7 +73,7 @@
         async function cargarMenu() {
             try {
                 // CAMBIO AQUÍ: Usamos tu link de Dev Tunnel para que funcione en el celular
-                const respuesta = await fetch('https://rm0nscfv-3000.usw3.devtunnels.ms/api/menu/2');
+                const respuesta = await fetch('https://smartmenu-backend.onrender.com/api/menu/2');
                 const datos = await respuesta.json();
                 const contenedor = document.getElementById('lista-platillos');
                 
